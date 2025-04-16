@@ -1,0 +1,6 @@
+fastapi
+tortoise-orm
+pydantic
+uvicorn
+python-dotenv
+
