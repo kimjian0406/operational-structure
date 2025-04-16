@@ -53,3 +53,43 @@ async def unlike_review(
         is_liked=review_like.is_liked
     )
 
+@like_router.post("/reviews/{review_id}/like", status_code=200)
+async def like_review(request: Request, review_id: int = Path(gt=0)) -> ReviewLikeResponse:
+    user_id = request.state.user.id
+    like, _ = await ReviewLike.get_or_create(user_id=user_id, review_id=review_id)
+
+    if not like.is_liked:
+        like.is_liked = True
+        await like.save()
+
+    return ReviewLikeResponse(
+        id=like.id,
+        user_id=like.user_id,
+        review_id=like.review_id,
+        is_liked=like.is_liked,
+    )
+
+
+@like_router.post("/reviews/{review_id}/unlike", status_code=200)
+async def unlike_review(request: Request, review_id: int = Path(gt=0)) -> ReviewLikeResponse:
+    user_id = request.state.user.id
+    like = await ReviewLike.get_or_none(user_id=user_id, review_id=review_id)
+
+    if not like:
+        return ReviewLikeResponse(
+            id=None,
+            user_id=user_id,
+            review_id=review_id,
+            is_liked=False,
+        )
+
+    if like.is_liked:
+        like.is_liked = False
+        await like.save()
+
+    return ReviewLikeResponse(
+        id=like.id,
+        user_id=like.user_id,
+        review_id=like.review_id,
+        is_liked=like.is_liked,
+    )

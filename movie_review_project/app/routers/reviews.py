@@ -126,3 +126,18 @@ async def get_movie_reviews(movie_id: int = Path(gt=0)) -> list[ReviewResponse]:
         )
         for review in reviews
     ]
+@review_router.get("/{review_id}/like_count", status_code=200)
+async def get_review_like_count(review_id: int = Path(gt=0)) -> ReviewLikeCountResponse:
+    like_count = await ReviewLike.filter(review_id=review_id, is_liked=True).count()
+    return ReviewLikeCountResponse(review_id=review_id, like_count=like_count)
+
+
+@review_router.get("/{review_id}/is_liked", status_code=200)
+async def is_review_liked(request: Request, review_id: int = Path(gt=0)) -> ReviewIsLikedResponse:
+    user_id = request.state.user.id
+    like = await ReviewLike.get_or_none(user_id=user_id, review_id=review_id)
+
+    return ReviewIsLikedResponse(
+        review_id=review_id,
+        is_liked=like.is_liked if like else False,
+    )

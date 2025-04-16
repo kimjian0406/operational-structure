@@ -135,3 +135,21 @@ if __name__ == '__main__':
     uvicorn.run(app, host='0.0.0.0', port=8000)
 from app.routers.notifications_ws import ws_router
 app.include_router(ws_router)
+from routers_reply import router as reply_router
+app.include_router(reply_router)
+from fastapi import FastAPI
+from crud import reply_like  # reply_like 라우터 불러오기
+
+app = FastAPI()
+
+# 라우터 등록
+app.include_router(reply_like.router, prefix="/reply-likes", tags=["Reply Likes"])
+
+from fastapi import FastAPI
+from routers import reply_like  # reply_like 라우터 불러오기
+
+app = FastAPI()
+
+# 라우터 등록
+app.include_router(reply_like.router, prefix="/reply-likes", tags=["Reply Likes"])
+
